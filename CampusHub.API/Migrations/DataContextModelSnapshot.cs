@@ -111,7 +111,7 @@ namespace CampusHub.API.Migrations
                     b.ToTable("Countries");
                 });
 
-            modelBuilder.Entity("CampusHub.Shared.Entities.Product", b =>
+            modelBuilder.Entity("CampusHub.Shared.Entities.Faculty", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,73 +119,17 @@ namespace CampusHub.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<float>("Stock")
-                        .HasColumnType("real");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("CampusHub.Shared.Entities.ProductCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductCategories");
-                });
-
-            modelBuilder.Entity("CampusHub.Shared.Entities.ProductImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductImages");
+                    b.ToTable("Faculties");
                 });
 
             modelBuilder.Entity("CampusHub.Shared.Entities.PropertyCategory", b =>
@@ -208,7 +152,7 @@ namespace CampusHub.API.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.ToTable("PropertyCategories");
+                    b.ToTable("PropertyCategory");
                 });
 
             modelBuilder.Entity("CampusHub.Shared.Entities.PropertyImage", b =>
@@ -230,7 +174,7 @@ namespace CampusHub.API.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.ToTable("PropertyImages");
+                    b.ToTable("PropertyImage");
                 });
 
             modelBuilder.Entity("CampusHub.Shared.Entities.State", b =>
@@ -255,6 +199,54 @@ namespace CampusHub.API.Migrations
                         .IsUnique();
 
                     b.ToTable("States");
+                });
+
+            modelBuilder.Entity("CampusHub.Shared.Entities.Subject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("UniversityProgramId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UniversityProgramId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Subjects");
+                });
+
+            modelBuilder.Entity("CampusHub.Shared.Entities.UniversityProgram", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FacultyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FacultyId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("UniversityPrograms");
                 });
 
             modelBuilder.Entity("CampusHub.Shared.Entities.User", b =>
@@ -351,27 +343,6 @@ namespace CampusHub.API.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Grade", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("IdUniversityLife")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Grades");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -533,7 +504,10 @@ namespace CampusHub.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Properties");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Property");
                 });
 
             modelBuilder.Entity("UniversityLife", b =>
@@ -576,40 +550,10 @@ namespace CampusHub.API.Migrations
                     b.Navigation("State");
                 });
 
-            modelBuilder.Entity("CampusHub.Shared.Entities.ProductCategory", b =>
-                {
-                    b.HasOne("CampusHub.Shared.Entities.Category", "Category")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CampusHub.Shared.Entities.Product", "Product")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("CampusHub.Shared.Entities.ProductImage", b =>
-                {
-                    b.HasOne("CampusHub.Shared.Entities.Product", "Product")
-                        .WithMany("ProductImages")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("CampusHub.Shared.Entities.PropertyCategory", b =>
                 {
                     b.HasOne("CampusHub.Shared.Entities.Category", "Category")
-                        .WithMany()
+                        .WithMany("ProductCategories")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -645,6 +589,28 @@ namespace CampusHub.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("CampusHub.Shared.Entities.Subject", b =>
+                {
+                    b.HasOne("CampusHub.Shared.Entities.UniversityProgram", "UniversityProgram")
+                        .WithMany("Subjects")
+                        .HasForeignKey("UniversityProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UniversityProgram");
+                });
+
+            modelBuilder.Entity("CampusHub.Shared.Entities.UniversityProgram", b =>
+                {
+                    b.HasOne("CampusHub.Shared.Entities.Faculty", "Faculty")
+                        .WithMany("UniversityPrograms")
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Faculty");
                 });
 
             modelBuilder.Entity("CampusHub.Shared.Entities.User", b =>
@@ -724,16 +690,19 @@ namespace CampusHub.API.Migrations
                     b.Navigation("States");
                 });
 
-            modelBuilder.Entity("CampusHub.Shared.Entities.Product", b =>
+            modelBuilder.Entity("CampusHub.Shared.Entities.Faculty", b =>
                 {
-                    b.Navigation("ProductCategories");
-
-                    b.Navigation("ProductImages");
+                    b.Navigation("UniversityPrograms");
                 });
 
             modelBuilder.Entity("CampusHub.Shared.Entities.State", b =>
                 {
                     b.Navigation("Cities");
+                });
+
+            modelBuilder.Entity("CampusHub.Shared.Entities.UniversityProgram", b =>
+                {
+                    b.Navigation("Subjects");
                 });
 
             modelBuilder.Entity("Property", b =>

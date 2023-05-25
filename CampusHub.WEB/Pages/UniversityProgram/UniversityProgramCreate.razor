@@ -1,0 +1,38 @@
+﻿@using CampusHub.Shared.Entities;
+@page "/universityPrograms/create/{FacultyId:int}"
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+
+<h3>Crear Programa universitario</h3>
+
+<UniversityProgramForm @ref="universityProgramForm" UniversityProgram="universityProgram" OnValidSubmit="CreateAsync" ReturnAction="Return" />
+
+@code {
+    private UniversityProgram universityProgram = new();
+    private UniversityProgramForm? universityProgramForm;
+
+    [Parameter]
+    public int FacultyId { get; set; }
+
+    private async Task CreateAsync()
+    {
+
+        universityProgram.FacultyId = FacultyId;
+        var httpResponse = await repository.Post("/api/universityPrograms", universityProgram);
+        if (httpResponse.Error)
+        {
+            var message = await httpResponse.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        Return();
+    }
+
+    private void Return()
+    {
+        universityProgramForm!.FormPostedSuccessfully = true;
+        navigationManager.NavigateTo($"/faculties/details/{FacultyId}");
+    }
+}

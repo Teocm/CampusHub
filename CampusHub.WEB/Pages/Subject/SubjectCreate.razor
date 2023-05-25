@@ -1,0 +1,39 @@
+﻿@page "/subjects/create/{UniversityProgramId:int}"
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+@using CampusHub.Shared.Entities;
+
+
+<h3>Crear Asignatura</h3>
+
+<SubjectForm @ref="subjectForm" Subject="subject" OnValidSubmit="CreateAsync" ReturnAction="Return" />
+
+@code {
+    private Subject subject = new();
+    private SubjectForm? subjectForm;
+
+    [Parameter]
+    public int UniversityProgramId { get; set; }
+
+    private async Task CreateAsync()
+    {
+        subject.UniversityProgramId = UniversityProgramId;
+        var httpResponse = await repository.Post("/api/subjects", subject);
+        if (httpResponse.Error)
+        {
+            var message = await httpResponse.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        Return();
+    }
+
+    private void Return()
+    {
+        subjectForm!.FormPostedSuccessfully = true;
+        navigationManager.NavigateTo($"/universityPrograms/details/{UniversityProgramId}");
+    }
+}
+

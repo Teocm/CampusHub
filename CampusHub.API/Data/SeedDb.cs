@@ -29,9 +29,9 @@ namespace CampusHub.API.Data
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
-            await CheckCountriesAsync();
+           // await CheckCountriesAsync();
             await CheckRolesAsync();
-            await CheckUserAsync("123", "admin", "super", "algo@correo", "300666666", "Cualquier cosa", UserType.Admin);
+            await CheckUserAsync("1010", "admin", "super", "algo@correo.edu.co", "300666666", "Cualquier cosa", UserType.Admin);
 
 
 

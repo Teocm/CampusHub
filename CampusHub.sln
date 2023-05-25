@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CampusHub.Shared", "CampusHub.Shared\CampusHub.Shared.csproj", "{B1B5EAA7-CDAA-4CC8-9ACB-E4D047654613}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampusHub.Shared", "CampusHub.Shared\CampusHub.Shared.csproj", "{B1B5EAA7-CDAA-4CC8-9ACB-E4D047654613}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CampusHub.API", "CampusHub.API\CampusHub.API.csproj", "{F3FFD3CA-ED14-497E-A2BB-C8A1C1E81E69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampusHub.API", "CampusHub.API\CampusHub.API.csproj", "{F3FFD3CA-ED14-497E-A2BB-C8A1C1E81E69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CampusHub.WEB", "CampusHub.WEB\CampusHub.WEB.csproj", "{1207D244-83EC-41B3-BC6F-328B1F5DD151}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampusHub.WEB", "CampusHub.WEB\CampusHub.WEB.csproj", "{1207D244-83EC-41B3-BC6F-328B1F5DD151}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

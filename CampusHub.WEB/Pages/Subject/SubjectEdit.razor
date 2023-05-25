@@ -1,0 +1,64 @@
+﻿@page "/subjects/edit/{SubjectId:int}"
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+@inject NavigationManager navigationManager
+@using CampusHub.Shared.Entities;
+@using System.Net;
+
+<h3>Editar Asignatura</h3>
+
+@if (subject is null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <SubjectForm @ref="subjectForm" Subject="subject" OnValidSubmit="EditAsync" ReturnAction="Return" />
+}
+
+@code {
+    private Subject? subject;
+    private SubjectForm? subjectForm;
+
+    [Parameter]
+    public int SubjectId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHttp = await repository.Get<Subject>($"/api/subjects/{SubjectId}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/faculties");
+                return;
+            }
+
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        subject = responseHttp.Response;
+    }
+
+    private async Task EditAsync()
+    {
+        var responseHttp = await repository.Put("/api/subjects", subject);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        Return();
+    }
+
+    private void Return()
+    {
+        subjectForm!.FormPostedSuccessfully = true;
+        navigationManager.NavigateTo($"/universityPrograms/details/{subject!.UniversityProgramId}");
+    }
+}

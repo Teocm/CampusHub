@@ -1,0 +1,116 @@
+﻿@page "/faculties/details/{Id:int}"
+@using CampusHub.Shared.Entities;
+@using System.Net;
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+
+@if (faculty is null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <h3>@faculty.Name</h3>
+    <div class="mb-2">
+        <a class="btn btn-primary" href="/universityPrograms/create/@faculty.Id">Nuevo Programa universitario</a>
+        <a class="btn btn-success" href="/faculties">Regresar</a>
+    </div>
+
+    <GenericList MyList="universityPrograms">
+        <Body>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Programa universitario</th>
+                        <th>Asignaturas</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var universityProgram in universityPrograms!)
+                    {
+                        <tr>
+                            <td>
+                                @universityProgram.Name
+                            </td>
+                            <td>
+                                @universityProgram.SubjectsNumber
+                            </td>
+                            <td>
+                                <a class="btn btn-info" href="/universityPrograms/details/@universityProgram.Id">Detalles</a>
+                                <a class="btn btn-warning" href="/universityPrograms/edit/@universityProgram.Id">Editar</a>
+                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(universityProgram.Id))>Borrar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </Body>
+    </GenericList>
+}
+
+@code {
+    private Faculty? faculty;
+    private List<UniversityProgram>? universityPrograms;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        var responseHttp = await repository.Get<Faculty>($"/api/faculties/{Id}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/faculties");
+                return;
+            }
+
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        faculty = responseHttp.Response;
+        universityPrograms = faculty!.UniversityPrograms!.ToList();
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmación",
+                Text = "¿Realmente deseas eliminar el registro?",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+                CancelButtonText = "No",
+                ConfirmButtonText = "Si"
+            });
+
+        var confirm = string.IsNullOrEmpty(result.Value);
+        if (confirm)
+        {
+            return;
+        }
+
+        var responseHttp = await repository.Delete($"/api/universityPrograms/{id}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode != HttpStatusCode.NotFound)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+        }
+
+        await LoadAsync();
+    }
+}

@@ -1,0 +1,65 @@
+﻿@using CampusHub.Shared.Entities;
+@page "/universityPrograms/edit/{UniversityProgramId:int}"
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+@inject NavigationManager navigationManager
+@using System.Net;
+
+
+<h3>Editar Programa universitario</h3>
+
+@if (universityProgram is null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <UniversityProgramForm @ref="universityProgramForm" UniversityProgram="universityProgram" OnValidSubmit="EditAsync" ReturnAction="Return" />
+}
+
+@code {
+    private UniversityProgram? universityProgram;
+    private UniversityProgramForm? universityProgramForm;
+
+    [Parameter]
+    public int UniversityProgramId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHttp = await repository.Get<UniversityProgram>($"/api/universityPrograms/{UniversityProgramId}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/faculties");
+                return;
+            }
+
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        universityProgram = responseHttp.Response;
+    }
+
+    private async Task EditAsync()
+    {
+        var responseHttp = await repository.Put("/api/universityPrograms", universityProgram);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        Return();
+    }
+
+    private void Return()
+    {
+        universityProgramForm!.FormPostedSuccessfully = true;
+        navigationManager.NavigateTo($"/faculties/details/{universityProgram!.FacultyId}");
+    }
+}
